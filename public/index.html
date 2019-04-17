@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>チャット</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="http://localhost:8888/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket;
+        var emit;
+        (function () {
+            // socket通信が開始される
+            socket = io.connect("http://localhost:8888");
+            emit = function (name, data) {
+                socket.emit(name, JSON.stringify(data))
+            }
+        })()
+
+        window.onload = function () {
+            var sendButton = document.getElementById('send-button')
+            var messageBox = document.getElementById('message-box')
+            sendButton.addEventListener('click', function () {
+                emit('message', {
+                    text: messageBox.value
+                })
+            })
+            socket.on('recieveMessage', function (data) {
+                var data = JSON.parse(data)
+                var li = document.createElement('li')
+                var ul = document.getElementById('messageList')
+
+                li.textContent = data.text
+                ul.appendChild(li)
+            })
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <textarea id="message-box" rows="4" cols="40"></textarea>
+        <button type="button" id="send-button">送信</button>
+    </div>
+    <div>
+        <ul id="messageList"></ul>
+    </div>
+</body>
+</html>
